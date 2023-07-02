@@ -1,37 +1,28 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {Container, Form} from "react-bootstrap";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import {NavLink, useLocation, useHistory} from "react-router-dom";
 import {LOGIN_ROUTE, REGISTRATION_ROUTE, SHOP_ROUTE} from "../utils/consts";
-import {login, registration} from "../http/userAPI";
-import {observer} from "mobx-react-lite";
-import {Context} from "../index";
+import {useAppDispatch} from "../hooks/redux";
+import {logIn, register} from "../store/reducers/user/userActions";
 
-const Auth = observer(() => {
-    const {user} = useContext(Context)
+const Auth = () => {
+    const dispatch = useAppDispatch()
     const location = useLocation()
     const history = useHistory()
     const isLogin = location.pathname === LOGIN_ROUTE
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const click = async () => {
-        try {
-            let data;
-            if (isLogin) {
-                data = await login(email, password);
-            } else {
-                data = await registration(email, password);
-            }
-            user.setUser(user)
-            user.setIsAuth(true)
-            history.push(SHOP_ROUTE)
-        } catch (e) {
-            alert(e.response.data.message)
+    const handleClick = async () => {
+        if (isLogin) {
+            dispatch(logIn({email, password}))
+        } else {
+            dispatch(register({email, password}))
         }
-
+        history.push(SHOP_ROUTE)
     }
 
     return (
@@ -67,7 +58,7 @@ const Auth = observer(() => {
                         }
                         <Button
                             variant={"outline-success"}
-                            onClick={click}
+                            onClick={handleClick}
                         >
                             {isLogin ? 'Войти' : 'Регистрация'}
                         </Button>
@@ -77,6 +68,6 @@ const Auth = observer(() => {
             </Card>
         </Container>
     );
-});
+};
 
 export default Auth;
