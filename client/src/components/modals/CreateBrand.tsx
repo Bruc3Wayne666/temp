@@ -1,16 +1,17 @@
 import React, {useState} from 'react';
 import Modal from "react-bootstrap/Modal";
 import {Button, Form} from "react-bootstrap";
-import {createBrand, createType} from "../../http/deviceAPI";
+import {useAppDispatch} from "../../hooks/redux";
+import {addBrand} from "../../store/reducers/device/deviceActions";
 
-const CreateBrand = ({show, onHide}) => {
+const CreateBrand = ({show, onHide}: {show: boolean, onHide: () => void}) => {
+    const dispatch = useAppDispatch()
     const [value, setValue] = useState('')
 
-    const addBrand = () => {
-        createBrand({name: value}).then(data => {
-            setValue('')
-            onHide()
-        })
+    const handleClick = () => {
+        dispatch(addBrand({name: value}))
+        setValue('')
+        onHide()
     }
     return (
         <Modal
@@ -34,7 +35,7 @@ const CreateBrand = ({show, onHide}) => {
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="outline-danger" onClick={onHide}>Закрыть</Button>
-                <Button variant="outline-success" onClick={addBrand}>Добавить</Button>
+                <Button variant="outline-success" onClick={handleClick}>Добавить</Button>
             </Modal.Footer>
         </Modal>
     );

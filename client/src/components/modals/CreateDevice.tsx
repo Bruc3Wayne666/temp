@@ -1,45 +1,47 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Modal from "react-bootstrap/Modal";
 import {Button, Dropdown, Form, Row, Col} from "react-bootstrap";
-import {Context} from "../../index";
-import {createDevice, fetchBrands, fetchDevices, fetchTypes} from "../../http/deviceAPI";
-import {observer} from "mobx-react-lite";
+import {useAppDispatch, useAppSelector} from "../../hooks/redux";
+import {addDevice, getBrands, getTypes} from "../../store/reducers/device/deviceActions";
+import {setSelectedBrand, setSelectedType} from "../../store/reducers/device/deviceSlice";
 
-const CreateDevice = observer(({show, onHide}) => {
-    const {device} = useContext(Context)
+const CreateDevice = ({show, onHide}: {show: boolean, onHide: () => void}) => {
+    const dispatch = useAppDispatch()
+    const {types, brands, selectedType, selectedBrand} = useAppSelector(state => state.deviceSlice)
     const [name, setName] = useState('')
     const [price, setPrice] = useState(0)
-    const [file, setFile] = useState(null)
-    const [info, setInfo] = useState([])
+    const [file, setFile] = useState('')
+    const [info, setInfo] = useState<any>([])
 
     useEffect(() => {
-        fetchTypes().then(data => device.setTypes(data))
-        fetchBrands().then(data => device.setBrands(data))
+        dispatch(getTypes())
+        dispatch(getBrands())
     }, [])
 
     const addInfo = () => {
         setInfo([...info, {title: '', description: '', number: Date.now()}])
     }
-    const removeInfo = (number) => {
-        setInfo(info.filter(i => i.number !== number))
+    const removeInfo = (number: number) => {
+        setInfo(info.filter((i: any) => i.number !== number))
     }
-    const changeInfo = (key, value, number) => {
-        setInfo(info.map(i => i.number === number ? {...i, [key]: value} : i))
+    const changeInfo = (key: string, value: string, number: number) => {
+        setInfo(info.map((i: any) => i.number === number ? {...i, [key]: value} : i))
     }
 
-    const selectFile = e => {
+    const selectFile = (e: any) => {
         setFile(e.target.files[0])
     }
 
-    const addDevice = () => {
+    const handleAdd = () => {
         const formData = new FormData()
         formData.append('name', name)
         formData.append('price', `${price}`)
         formData.append('img', file)
-        formData.append('brandId', device.selectedBrand.id)
-        formData.append('typeId', device.selectedType.id)
+        formData.append('brandId', selectedBrand.id)
+        formData.append('typeId', selectedType.id)
         formData.append('info', JSON.stringify(info))
-        createDevice(formData).then(data => onHide())
+        dispatch(addDevice(formData))
+        onHide()
     }
 
     return (
@@ -56,11 +58,11 @@ const CreateDevice = observer(({show, onHide}) => {
             <Modal.Body>
                 <Form>
                     <Dropdown className="mt-2 mb-2">
-                        <Dropdown.Toggle>{device.selectedType.name || "Выберите тип"}</Dropdown.Toggle>
+                        <Dropdown.Toggle>{selectedType.name || "Выберите тип"}</Dropdown.Toggle>
                         <Dropdown.Menu>
-                            {device.types.map(type =>
+                            {types.map(type =>
                                 <Dropdown.Item
-                                    onClick={() => device.setSelectedType(type)}
+                                    onClick={() => dispatch(setSelectedType(type))}
                                     key={type.id}
                                 >
                                     {type.name}
@@ -69,11 +71,11 @@ const CreateDevice = observer(({show, onHide}) => {
                         </Dropdown.Menu>
                     </Dropdown>
                     <Dropdown className="mt-2 mb-2">
-                        <Dropdown.Toggle>{device.selectedBrand.name || "Выберите тип"}</Dropdown.Toggle>
+                        <Dropdown.Toggle>{selectedBrand.name || "Выберите тип"}</Dropdown.Toggle>
                         <Dropdown.Menu>
-                            {device.brands.map(brand =>
+                            {brands.map(brand =>
                                 <Dropdown.Item
-                                    onClick={() => device.setSelectedBrand(brand)}
+                                    onClick={() => dispatch(setSelectedBrand(brand))}
                                     key={brand.id}
                                 >
                                     {brand.name}
@@ -136,10 +138,10 @@ const CreateDevice = observer(({show, onHide}) => {
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="outline-danger" onClick={onHide}>Закрыть</Button>
-                <Button variant="outline-success" onClick={addDevice}>Добавить</Button>
+                <Button variant="outline-success" onClick={handleAdd}>Добавить</Button>
             </Modal.Footer>
         </Modal>
     );
-});
+};
 
 export default CreateDevice;

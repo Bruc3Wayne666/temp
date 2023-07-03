@@ -1,7 +1,13 @@
 import {checkLogin, logIn, register} from "./userActions";
-import { PayloadAction } from "@reduxjs/toolkit/dist/createAction";
-import { createSlice } from "@reduxjs/toolkit";
+import {PayloadAction} from "@reduxjs/toolkit/dist/createAction";
+import {createSlice} from "@reduxjs/toolkit";
 
+
+const initialUser = {
+    id: 0,
+    email: '',
+    role: ''
+}
 
 interface User {
     id: number
@@ -18,25 +24,18 @@ interface IUserState {
 const initialState: IUserState = {
     isLoading: false,
     isAuth: false,
-    user: {
-        id: 0,
-        email: '',
-        role: ''
-    }
+    user: initialUser
 }
 
 export const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        // setIsAuth(state, {payload}: PayloadAction<boolean>) {
-        //     state.isAuth = payload
-        // },
-        // setUser(state, {payload}: PayloadAction<any>) {
-        //     state.user = payload
-        // },
         logout(state) {
-            state = initialState
+            state.isLoading = false
+            state.isAuth = false
+            state.user = initialUser
+            localStorage.removeItem('token')
         }
     },
     extraReducers: {
@@ -56,11 +55,21 @@ export const userSlice = createSlice({
             state.user = payload
             state.isAuth = true
         },
+        [checkLogin.pending.type]: (state) => {
+            state.isLoading = true
+        },
         [checkLogin.fulfilled.type]: (state, {payload}: PayloadAction<User>) => {
+            state.isLoading = false
             state.user = payload
             state.isAuth = true
+        },
+        [checkLogin.rejected.type]: (state) => {
+            state.isLoading = false
+            state.user = initialUser
+            state.isAuth = false
         }
     }
 })
 
+export const {logout} = userSlice.actions
 export default userSlice.reducer

@@ -10,7 +10,7 @@ class DeviceController {
             const {img} = req.files
             let fileName = uuid.v4() + ".jpg"
             img.mv(path.resolve(__dirname, '..', 'static', fileName))
-            const device = await Device.create({name, price, brandId, typeId, img: fileName});
+            const device = await Device.create({name, price, typeId, brandId, img: fileName});
 
             if (info) {
                 info = JSON.parse(info)
@@ -36,6 +36,7 @@ class DeviceController {
         limit = limit || 9
         let offset = page * limit - limit
         let devices;
+
         if (!brandId && !typeId) {
             devices = await Device.findAndCountAll({limit, offset})
         }

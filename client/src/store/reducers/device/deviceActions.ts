@@ -1,7 +1,13 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {registration, login} from "../../../http/userAPI";
-import {createBrand, createDevice, createType, fetchBrands, fetchDevices, fetchTypes} from "../../../http/deviceAPI";
-import {Device} from "./deviceSlice";
+import {
+    createBrand,
+    createDevice,
+    createType,
+    fetchBrands,
+    fetchDevices,
+    fetchOneDevice,
+    fetchTypes, getAllFromCart, removeCartItem
+} from "../../../http/deviceAPI";
 
 
 export const getTypes = createAsyncThunk(
@@ -60,7 +66,7 @@ export const getDevices = createAsyncThunk(
 )
 
 export const addDevice = createAsyncThunk(
-    'user/addDevice',
+    'device/addDevice',
     async (device: any, {rejectWithValue}) => {
         try {
             return await createDevice(device)
@@ -71,10 +77,33 @@ export const addDevice = createAsyncThunk(
 )
 
 export const getOneDevice = createAsyncThunk(
-    'user/getOneDevice',
+    'device/getOneDevice',
     async (id: number, {rejectWithValue}) => {
         try {
-            return await getOneDevice(id)
+            return await fetchOneDevice(id)
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+)
+
+
+export const getFromCart = createAsyncThunk(
+    'device/getAllFromCart',
+    async (_, {rejectWithValue}) => {
+        try {
+            return await getAllFromCart()
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+)
+
+export const removeFromCart = createAsyncThunk(
+    'device/getAllFromCart',
+    async (id: number, {rejectWithValue}) => {
+        try {
+            return await removeCartItem(id)
         } catch (err) {
             return rejectWithValue(err)
         }

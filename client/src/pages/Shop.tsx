@@ -10,15 +10,17 @@ import Pages from "../components/Pages";
 import {useAppDispatch, useAppSelector} from "../hooks/redux";
 import {getBrands, getDevices, getTypes} from "../store/reducers/device/deviceActions";
 
-const Shop = observer(() => {
+const Shop = () => {
     const dispatch = useAppDispatch()
-    const {devices, selectedBrand, selectedType, page} = useAppSelector(state => state.deviceSlice)
+    const {selectedBrand, selectedType, page} = useAppSelector(state => state.deviceSlice)
 
     useEffect(() => {
         dispatch(getTypes())
         dispatch(getBrands())
         dispatch(getDevices({
+            //@ts-ignore
             typeId: null,
+            //@ts-ignore
             brandId: null,
             page: 1,
             limit: 2
@@ -28,8 +30,8 @@ const Shop = observer(() => {
     useEffect(() => {
         dispatch(getDevices({
             limit: 5,
-            typeId: selectedType,
-            brandId: selectedBrand,
+            typeId: selectedType.id,
+            brandId: selectedBrand.id,
             page
         }))
     }, [page, selectedType, selectedBrand])
@@ -48,6 +50,6 @@ const Shop = observer(() => {
             </Row>
         </Container>
     );
-});
+};
 
 export default Shop;

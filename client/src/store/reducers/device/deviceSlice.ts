@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {getBrands, getDevices, getOneDevice, getTypes} from "./deviceActions";
+import {getBrands, getDevices, getFromCart, getOneDevice, getTypes, removeFromCart} from "./deviceActions";
 
 
 export interface Device {
@@ -34,6 +34,7 @@ interface IDeviceState {
     types: Type[]
     brands: Brand[]
     devices: Device[]
+    cart: Device[]
     currentDevice: Device
     selectedType: any
     selectedBrand: any
@@ -47,7 +48,19 @@ const initialState: IDeviceState = {
     types: [],
     brands: [],
     devices: [],
-    currentDevice: null,
+    cart: [],
+    currentDevice: {
+        id: 0,
+        name: '',
+        price: 0,
+        rating: 0,
+        img: '',
+        createdAt: '',
+        updatedAt: '',
+        typeId: 0,
+        brandId: 0,
+        info: []
+    },
     selectedType: {},
     selectedBrand: {},
     page: 1,
@@ -62,11 +75,11 @@ export const deviceSlice = createSlice({
         setPage(state, {payload}: PayloadAction<number>) {
             state.page = payload
         },
-        setSelectedBrand(state, {payload}: PayloadAction<number>) {
+        setSelectedBrand(state, {payload}: PayloadAction<Type>) {
             state.page = 1
             state.selectedBrand = payload
         },
-        setSelectedType(state, {payload}: PayloadAction<number>) {
+        setSelectedType(state, {payload}: PayloadAction<Brand>) {
             state.page = 1
             state.selectedType = payload
         }
@@ -75,9 +88,10 @@ export const deviceSlice = createSlice({
         [getDevices.pending.type]: (state) => {
             state.isLoading = true
         },
-        [getDevices.fulfilled.type]: (state, {payload}: PayloadAction<Device[]>) => {
+        [getDevices.fulfilled.type]: (state, {payload}: PayloadAction<{count: number, rows: Device[]}>) => {
             state.isLoading = false
-            state.devices = payload
+            state.devices = payload.rows
+            state.totalCount = payload.count
         },
         [getBrands.pending.type]: (state) => {
             state.isLoading = true
@@ -99,8 +113,23 @@ export const deviceSlice = createSlice({
         [getOneDevice.fulfilled.type]: (state, {payload}: PayloadAction<Device>) => {
             state.isLoading = false
             state.currentDevice = payload
-        }
+        },
+        // [getFromCart.pending.type]: (state) => {
+        //     state.isLoading = true
+        // },
+        // [getFromCart.fulfilled.type]: (state, {payload}: PayloadAction<Device[]>) => {
+        //     state.cart = payload
+        //     state.isLoading = false
+        // },
+        // [removeFromCart.pending.type]: (state) => {
+        //     state.isLoading = true
+        // },
+        // [removeFromCart.fulfilled.type]: (state, {payload}: PayloadAction<{id: number}>) => {
+        //     state.isLoading = false
+        //     state.cart = state.cart.filter(item => item.id !== payload.id)
+        // }
     }
 })
 
+export const {setPage, setSelectedBrand, setSelectedType} = deviceSlice.actions
 export default deviceSlice.reducer
