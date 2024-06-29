@@ -34,7 +34,7 @@ const NavBar = () => {
                 justifyContent: 'space-between'
             }}>
                 <NavLink style={{color: 'white'}} to={SHOP_ROUTE}>
-                    <h1>DigitalTown</h1>
+                    <h1>MIRAS e-shop</h1>
                 </NavLink>
                 {isAuth ?
                     <Nav className="ml-auto" style={{color: 'white'}}>

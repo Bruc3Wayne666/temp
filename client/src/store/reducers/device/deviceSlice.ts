@@ -114,20 +114,6 @@ export const deviceSlice = createSlice({
             state.isLoading = false
             state.currentDevice = payload
         },
-        // [getFromCart.pending.type]: (state) => {
-        //     state.isLoading = true
-        // },
-        // [getFromCart.fulfilled.type]: (state, {payload}: PayloadAction<Device[]>) => {
-        //     state.cart = payload
-        //     state.isLoading = false
-        // },
-        // [removeFromCart.pending.type]: (state) => {
-        //     state.isLoading = true
-        // },
-        // [removeFromCart.fulfilled.type]: (state, {payload}: PayloadAction<{id: number}>) => {
-        //     state.isLoading = false
-        //     state.cart = state.cart.filter(item => item.id !== payload.id)
-        // }
     }
 })
 
